@@ -94,4 +94,4 @@ dist/aei-bookmarklet.html         书签版产物
 
 ## License
 
-All Rights Reserved.
+Apache License 2.0，详见 [LICENSE](LICENSE)。

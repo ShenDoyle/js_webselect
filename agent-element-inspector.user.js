@@ -4,7 +4,7 @@
 // @version      0.0.1
 // @description  面向浏览器 Agent 的网页元素侦察工具：人工精准选中元素 → 采集完整 DOM 事实 → 生成并验证多框架定位表达式 → 输出 Agent 可直接使用的信息包
 // @author       左³
-// @license      All Rights Reserved
+// @license      Apache-2.0
 // @homepageURL  https://www.strava.com/athletes/142433407
 // @supportURL   https://www.strava.com/athletes/142433407
 // @match        *://*/*
