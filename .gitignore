@@ -1,0 +1,5 @@
+*.bak
+*.bak-*
+.screenshots/
+.trae-html-share-packages/
+__pycache__/

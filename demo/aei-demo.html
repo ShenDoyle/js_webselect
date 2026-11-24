@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网页元素选择器（Agent Element Inspector）· 验收演示页</title>
+<style>
+  body { font: 14px/1.65 -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; margin: 0; padding: 16px 470px 60px 18px; color: #1c2430; background: #f6f8fb; }
+  h1 { font-size: 19px; margin: 0 0 6px; }
+  h2 { font-size: 14px; margin: 22px 0 8px; padding-left: 8px; border-left: 3px solid #1f6feb; }
+  .tip { color: #5d6b7d; font-size: 12.5px; margin: 0 0 12px; }
+  section.demo { background: #fff; border: 1px solid #dde3ec; border-radius: 8px; padding: 10px 12px; }
+  button { font: inherit; padding: 5px 12px; border-radius: 6px; border: 1px solid #c9d2de; background: #fff; cursor: pointer; }
+  button.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { padding: 2px 0; }
+  input { font: inherit; padding: 4px 8px; border: 1px solid #c9d2de; border-radius: 6px; }
+  label { margin-right: 6px; }
+  .row { margin: 6px 0; }
+  iframe { width: 260px; height: 60px; border: 1px dashed #9aa8ba; border-radius: 6px; }
+  #tests { background: #0f1520; color: #cfe0f2; border-radius: 8px; padding: 10px 12px; font: 12px/1.6 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; max-height: 260px; overflow: auto; }
+  .pass { color: #56d364; }
+  .fail { color: #ff7b72; }
+  .sum { color: #79c0ff; font-weight: 700; }
+  .modal { position: fixed; inset: 0; background: rgba(15,21,32,.55); display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .modal[hidden] { display: none; }
+  .modal-box { background: #fff; padding: 18px 22px; border-radius: 10px; min-width: 240px; }
+</style>
+</head>
+<body>
+
+<h1>网页元素选择器（Agent Element Inspector）· 验收演示页</h1>
+<p class="tip">
+  本页覆盖验收标准中的 10 类页面场景，并在加载后自动运行自检脚本（结果见下方）。<br>
+  手动体验：点击右侧面板「开始选择」→ 鼠标悬停高亮 → 单击锁定元素。快捷键 Alt+Shift+E 显隐面板，Alt+Shift+S 开始选择，Esc 退出，方向键切换父/子/兄弟元素。
+</p>
+
+<pre id="tests">自检准备中…</pre>
+
+<h2>1. 普通 HTML 页面</h2>
+<section class="demo">
+  <button id="btn-save" class="btn primary" type="button" data-testid="save-btn" aria-label="保存表单">保存</button>
+  <a id="link-doc" class="link" href="#docs" aria-label="查看文档" title="文档入口">文档</a>
+</section>
+
+<h2>2. 多层嵌套 DOM</h2>
+<section class="demo">
+  <div id="deep-1" class="l1">
+    <div class="l2">
+      <section class="l3">
+        <ul class="l4">
+          <li class="l5"><span class="l6">嵌套文本 <a id="deep-link" class="deep-a" href="#deep">深层链接</a></span></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</section>
+
+<h2>3. 相同文本的多个按钮</h2>
+<section class="demo">
+  <ul id="list-dup"></ul>
+</section>
+
+<h2>4. 动态加载列表</h2>
+<section class="demo">
+  <button id="btn-load" type="button">加载列表</button>
+  <ul id="dyn-list"></ul>
+</section>
+
+<h2>5. SPA 视图重渲染</h2>
+<section class="demo">
+  <div id="spa-view"><p id="spa-text">初始内容</p></div>
+  <button id="btn-rerender" type="button">重新渲染视图</button>
+</section>
+
+<h2>6. 表单页面</h2>
+<section class="demo">
+  <form id="login-form" onsubmit="return false;">
+    <div class="row"><label for="email">邮箱</label>
+      <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+    <div class="row"><label for="pwd">密码</label>
+      <input id="pwd" name="password" type="password" value="secret123" autocomplete="current-password"></div>
+    <div class="row"><input type="checkbox" id="remember" name="remember"><label for="remember">记住我</label></div>
+    <div class="row"><button id="btn-submit" class="primary" type="submit" data-testid="login-submit">登录</button></div>
+  </form>
+</section>
+
+<h2>7. 弹窗与浮层（遮挡）</h2>
+<section class="demo">
+  <div id="occlude-wrap" style="position:relative;height:56px">
+    <button id="occluded-btn" type="button" style="position:absolute;left:0;top:0;width:230px;height:44px">被遮挡的按钮</button>
+    <div id="cover" style="position:absolute;left:0;top:0;width:230px;height:44px;background:rgba(15,21,32,.55);z-index:2"></div>
+  </div>
+  <button id="btn-modal" type="button">打开弹窗</button>
+  <div id="modal" class="modal" hidden><div class="modal-box"><h3 style="margin:0 0 8px">弹窗</h3><button id="modal-ok" type="button">确定</button></div></div>
+</section>
+
+<h2>8. iframe 页面</h2>
+<section class="demo">
+  <iframe id="frame-test" title="same-origin iframe"></iframe>
+</section>
+
+<h2>9. Shadow DOM 页面</h2>
+<section class="demo">
+  <div id="shadow-host"></div>
+  <div id="closed-host"></div>
+</section>
+
+<h2>10. 隐藏元素</h2>
+<section class="demo">
+  <div id="hidden-el" style="display:none">不可见元素</div>
+</section>
+
+<script src="../agent-element-inspector.user.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- 场景准备 ---------- */
+  var dup = document.getElementById('list-dup');
+  for (var i = 1; i <= 8; i++) {
+    var li = document.createElement('li');
+    li.setAttribute('data-row', String(i));
+    li.innerHTML = '<button class="row-btn" type="button" data-row="' + i + '">编辑</button>';
+    dup.appendChild(li);
+  }
+
+  document.getElementById('btn-load').addEventListener('click', function () {
+    var ul = document.getElementById('dyn-list');
+    ul.innerHTML = '';
+    for (var k = 1; k <= 5; k++) {
+      var item = document.createElement('li');
+      item.className = 'dyn-item';
+      item.setAttribute('data-index', String(k));
+      item.innerHTML = '<span>项目 ' + k + '</span> <button class="edit" type="button">编辑</button>';
+      ul.appendChild(item);
+    }
+  });
+
+  document.getElementById('btn-rerender').addEventListener('click', function () {
+    document.getElementById('spa-view').innerHTML =
+      '<p id="spa-text">重新渲染于 ' + new Date().toISOString() + '</p>' +
+      '<button id="spa-btn" type="button">新按钮</button>';
+  });
+
+  document.getElementById('btn-modal').addEventListener('click', function () {
+    document.getElementById('modal').hidden = false;
+  });
+  document.getElementById('modal-ok').addEventListener('click', function () {
+    document.getElementById('modal').hidden = true;
+  });
+
+  var openHost = document.getElementById('shadow-host');
+  var openRoot = openHost.attachShadow({ mode: 'open' });
+  openRoot.innerHTML = '<style>button{padding:5px 12px;border:1px solid #1f6feb;background:#eaf2ff;border-radius:6px}</style>' +
+    '<button id="shadow-btn" class="sbtn" type="button" data-testid="shadow-ok">影子按钮</button>';
+
+  var closedRoot = document.getElementById('closed-host').attachShadow({ mode: 'closed' });
+  closedRoot.innerHTML = '<button id="closed-btn" type="button">封闭影子按钮</button>';
+
+  var fr = document.getElementById('frame-test');
+  fr.srcdoc = '<!DOCTYPE html><html><body style="margin:6px;font:13px sans-serif">' +
+    '<button id="inner-btn" class="inner" type="button" data-testid="inner-ok">iframe 内按钮</button></body></html>';
+
+  /* ---------- 自检框架 ---------- */
+  var lines = [];
+  var pass = 0, fail = 0;
+  var out = document.getElementById('tests');
+
+  function paint() {
+    out.innerHTML = lines.map(function (l) {
+      var color = l.charAt(0) === 'P' ? 'pass' : (l.charAt(0) === 'F' ? 'fail' : 'sum');
+      return '<span class="' + color + '">' + l.replace(/[<>&]/g, function (c) {
+        return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c];
+      }) + '</span>';
+    }).join('\n');
+  }
+  function log(ok, name, msg) {
+    if (ok) pass++; else fail++;
+    lines.push((ok ? 'PASS' : 'FAIL') + ' | ' + name + (msg ? ' | ' + msg : ''));
+    paint();
+  }
+  function assert(name, cond, msg) { log(!!cond, name, cond ? '' : String(msg === undefined ? '' : msg)); }
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function waitFor(fn, timeout) {
+    var start = Date.now();
+    return new Promise(function (resolve, reject) {
+      (function tick() {
+        var v = null;
+        try { v = fn(); } catch (e) { v = null; }
+        if (v) return resolve(v);
+        if (Date.now() - start > (timeout || 4000)) return reject(new Error('等待超时'));
+        setTimeout(tick, 50);
+      })();
+    });
+  }
+  function sel(el) { window.__AEI__.select(el); return window.__AEI__.report(); }
+  function fw(j, name) { return j.locators.filter(function (l) { return l.framework === name; }); }
+  function anyUnique(j, name) {
+    return fw(j, name).some(function (l) { return l.matches === 1 && l.targetMatch === true; });
+  }
+
+  async function main() {
+    try {
+      await waitFor(function () { return window.__AEI__ && document.querySelector('[data-aei-host]'); }, 5000);
+    } catch (e) {
+      log(false, '脚本加载', '未检测到 AEI 面板');
+      return;
+    }
+    await wait(200);
+
+    /* ---- 1. 普通 HTML ---- */
+    var j = sel(document.getElementById('btn-save'));
+    assert('1.1 CSS 唯一且命中目标', anyUnique(j, 'css'), JSON.stringify(j.recommended.css));
+    assert('1.2 XPath 唯一且命中目标', anyUnique(j, 'xpath'));
+    assert('1.3 推荐 CSS 为 ID 选择器', j.recommended.css === '#btn-save', j.recommended.css);
+    assert('1.4 综合评级 A', j.overallGrade === 'A', j.overallGrade);
+    assert('1.5 Playwright getByTestId 唯一命中', fw(j, 'playwright').some(function (l) {
+      return l.expression.indexOf('getByTestId') >= 0 && l.matches === 1 && l.targetMatch;
+    }));
+    assert('1.6 Playwright getByRole 命中目标', fw(j, 'playwright').some(function (l) {
+      return l.expression.indexOf('getByRole') >= 0 && l.targetMatch;
+    }));
+    assert('1.7 Selenium By.ID 命中目标', fw(j, 'selenium').some(function (l) {
+      return l.expression.indexOf('By.ID') >= 0 && l.targetMatch;
+    }));
+    assert('1.8 完整属性含 data-testid', j.element.attributes['data-testid'] === 'save-btn');
+    assert('1.9 可访问名优先取 aria-label', j.element.accessibleName === '保存表单', j.element.accessibleName);
+    assert('1.10 状态判定可点击', j.state.clickable === true);
+    assert('1.11 文本 XPath 可定位', fw(j, 'xpath').some(function (l) {
+      return l.type === 'text' && l.matches === 1 && l.targetMatch;
+    }));
+    assert('1.12 绝对 XPath 命中目标', fw(j, 'xpath').some(function (l) {
+      return l.type === 'absolute' && l.targetMatch;
+    }));
+
+    /* ---- 2. 多层嵌套 ---- */
+    j = sel(document.getElementById('deep-link'));
+    assert('2.1 父级链完整（>=5 层）', j.dom.parents.length >= 5, j.dom.parents.length);
+    assert('2.2 层级路径含祖先 id', j.dom.path.indexOf('deep-1') >= 0, j.dom.path);
+    assert('2.3 CSS 唯一命中目标', anyUnique(j, 'css'));
+
+    /* ---- 3. 相同文本按钮 ---- */
+    j = sel(document.querySelectorAll('#list-dup .row-btn')[3]);
+    assert('3.1 相似元素总数 = 8', j.similar.total === 8, j.similar.total);
+    assert('3.2 当前元素为第 4 个', j.similar.index === 4, j.similar.index);
+    assert('3.3 按钮无同标签兄弟（父级只含一个按钮）', j.dom.siblings.total === 1 && j.dom.siblings.index === 1,
+      j.dom.siblings.total + '/' + j.dom.siblings.index);
+    var liReport = sel(document.querySelectorAll('#list-dup li')[3]);
+    assert('3.3b 列表项兄弟总数与位次正确', liReport.dom.siblings.total === 8 && liReport.dom.siblings.index === 4,
+      liReport.dom.siblings.total + '/' + liReport.dom.siblings.index);
+    sel(document.querySelectorAll('#list-dup .row-btn')[3]);
+    assert('3.4 存在唯一 CSS（nth-of-type 或结构）', anyUnique(j, 'css'));
+    assert('3.5 相似元素给出属性差异', j.similar.items.some(function (it) {
+      return !it.isTarget && it.diff && Object.keys(it.diff).length > 0;
+    }));
+    assert('3.6 相似元素标明所在容器', !!j.similar.items[0].container);
+
+    /* ---- 4. 动态加载 ---- */
+    document.getElementById('btn-load').click();
+    await wait(60);
+    var dynItems = document.querySelectorAll('#dyn-list li');
+    assert('4.1 动态列表已渲染 5 项', dynItems.length === 5, dynItems.length);
+    j = sel(dynItems[2]);
+    assert('4.2 动态元素 CSS 唯一命中', anyUnique(j, 'css'));
+    var snapshotTag = window.__AEI__.report().element.tagName;
+    dynItems[2].remove();
+    await wait(900);
+    assert('4.3 元素移除后标记失效', window.__AEI__.state.stale === true);
+    assert('4.4 失效后保留原始快照', window.__AEI__.report().element.tagName === snapshotTag);
+    assert('4.5 失效后复核旧定位器', (window.__AEI__.state.staleInfo || []).length > 0,
+      (window.__AEI__.state.staleInfo || []).length);
+
+    /* ---- 5. SPA 重渲染 ---- */
+    document.getElementById('btn-rerender').click();
+    await wait(60);
+    j = sel(document.getElementById('spa-btn'));
+    assert('5.1 重渲染后新元素可采集', j.element.id === 'spa-btn');
+    assert('5.2 新元素 CSS 唯一命中', anyUnique(j, 'css'));
+
+    /* ---- 6. 表单 ---- */
+    j = sel(document.getElementById('pwd'));
+    assert('6.1 密码值已脱敏', j.form.value === '[已脱敏]', j.form.value);
+    assert('6.2 敏感字段产生告警', j.warnings.some(function (w) { return w.indexOf('敏感') >= 0; }));
+    var je = sel(document.getElementById('email'));
+    assert('6.3 label 关联可访问名 = 邮箱', je.element.accessibleName === '邮箱', je.element.accessibleName);
+    assert('6.4 getByLabel 唯一命中', fw(je, 'playwright').some(function (l) {
+      return l.expression.indexOf('getByLabel') >= 0 && l.matches === 1 && l.targetMatch;
+    }));
+    assert('6.5 getByPlaceholder 命中目标', fw(je, 'playwright').some(function (l) {
+      return l.expression.indexOf('getByPlaceholder') >= 0 && l.targetMatch;
+    }));
+    assert('6.6 判定为可输入', je.state.editable === true);
+
+    /* ---- 7. 遮挡 ---- */
+    var occEl = document.getElementById('occluded-btn');
+    occEl.scrollIntoView({ block: 'center' });
+    await wait(80);
+    j = sel(occEl);
+    assert('7.1 中心点判定被遮挡', j.state.covered === true);
+    assert('7.2 遮挡比例 > 0', j.occlusion.coverRatio > 0, j.occlusion.coverRatio);
+    assert('7.3 记录遮挡元素', j.occlusion.blockers.length > 0 &&
+      j.occlusion.blockers[0].element.indexOf('cover') >= 0, JSON.stringify(j.occlusion.blockers));
+    assert('7.4 判定为不可点击', j.state.clickable === false);
+
+    /* ---- 8. iframe ---- */
+    var innerFrame = document.getElementById('frame-test');
+    await waitFor(function () { return innerFrame.contentDocument && innerFrame.contentDocument.getElementById('inner-btn'); }, 4000);
+    var innerBtn = innerFrame.contentDocument.getElementById('inner-btn');
+    j = sel(innerBtn);
+    assert('8.1 记录 iframe 链路', j.frameChain.length === 1, JSON.stringify(j.frameChain));
+    assert('8.2 iframe 内 CSS 唯一命中', anyUnique(j, 'css'), j.recommended.css);
+    assert('8.3 页面坐标含 frame 偏移', j.box.pageRect.x > 0 && j.box.pageRect.y > 0,
+      j.box.pageRect.x + ',' + j.box.pageRect.y);
+    assert('8.4 提示需切换 frame 上下文', j.warnings.some(function (w) { return w.indexOf('iframe') >= 0; }));
+
+    /* ---- 9. Shadow DOM ---- */
+    var sr = document.getElementById('shadow-host').shadowRoot;
+    j = sel(sr.getElementById('shadow-btn'));
+    assert('9.1 scope 标记为 shadow', j.scope === 'shadow', j.scope);
+    assert('9.2 记录影子宿主链', j.shadowChain.length === 1, JSON.stringify(j.shadowChain));
+    assert('9.3 Shadow 内 CSS 唯一命中', anyUnique(j, 'css'), j.recommended.css);
+    assert('9.4 提示需从 shadowRoot 查询', j.warnings.some(function (w) { return w.indexOf('Shadow') >= 0; }));
+    assert('9.6 影子元素不被误判为遮挡', j.state.covered === false && j.occlusion.coverRatio === 0,
+      j.state.covered + '/' + j.occlusion.coverRatio);
+    j = sel(document.getElementById('closed-host'));
+    assert('9.5 封闭 Shadow 不伪造内部结构', j.dom.children.count === 0 && j.shadowChain.length === 0,
+      j.dom.children.count + '/' + j.shadowChain.length);
+
+    /* ---- 10. 隐藏元素 ---- */
+    j = sel(document.getElementById('hidden-el'));
+    assert('10.1 判定为不可见', j.state.visible === false);
+    assert('10.2 产生不可见告警', j.warnings.some(function (w) { return w.indexOf('不可见') >= 0; }));
+
+    /* ---- 11. 选择模式不干扰页面 ---- */
+    var fired = 0;
+    var probe = document.getElementById('btn-save');
+    probe.addEventListener('click', function () { fired++; });
+    window.__AEI__.start();
+    probe.click();
+    window.__AEI__.stop();
+    assert('11.1 选择模式下未触发页面按钮', fired === 0, 'fired=' + fired);
+    assert('11.2 选择模式单击后已锁定元素', window.__AEI__.state.current === probe);
+
+    /* ---- 12. 信息包结构 ---- */
+    j = window.__AEI__.report();
+    var need = ['tool', 'version', 'collectedAt', 'page', 'element', 'dom', 'box', 'styles', 'state',
+      'occlusion', 'form', 'locators', 'recommended', 'overallGrade', 'similar', 'warnings'];
+    var missing = need.filter(function (k) { return !(k in j); });
+    assert('12.1 完整信息包字段齐全', missing.length === 0, missing.join(','));
+    var c = window.__AEI__.compact();
+    assert('12.2 精简信息包可生成', !!c && !!c.element && !!c.locators && !!c.state);
+    assert('12.3 每个定位器均带匹配数', j.locators.every(function (l) {
+      return typeof l.matches === 'number' && typeof l.grade === 'string';
+    }));
+    assert('12.4 唯一性定位器全部命中目标', j.locators.filter(function (l) {
+      return l.matches === 1;
+    }).every(function (l) { return l.targetMatch === true; }));
+
+    /* ---- 13. 面板交互 ---- */
+    var sh = document.querySelector('[data-aei-host]').shadowRoot;
+    var panel = sh.querySelector('[data-role="panel"]');
+    sh.querySelector('[data-act="collapse"]').click();
+    assert('13.1 折叠后隐藏面板主体', panel.classList.contains('collapsed'));
+    sh.querySelector('[data-act="collapse"]').click();
+    assert('13.2 再次点击恢复展开', !panel.classList.contains('collapsed'));
+    sh.querySelector('[data-act="close"]').click();
+    assert('13.3 关闭后隐藏面板', panel.classList.contains('hidden'));
+    assert('13.4 关闭后保留快捷入口', sh.querySelector('.launcher').classList.contains('show'));
+    sh.querySelector('.launcher').click();
+    assert('13.5 快捷入口可重新打开', !panel.classList.contains('hidden'));
+
+    var secDom = sh.querySelector('[data-sec="dom"]');
+    var beforeOpen = secDom.classList.contains('open');
+    secDom.querySelector('.sec-h').click();
+    assert('13.6 分区可折叠/展开', secDom.classList.contains('open') !== beforeOpen);
+    secDom.querySelector('.sec-h').click();
+
+    var search = sh.querySelector('[data-role="attr-search"]');
+    search.value = 'data-testid';
+    search.dispatchEvent(new Event('input', { bubbles: true }));
+    var filtered = sh.querySelectorAll('[data-role="attr-list"] .row').length;
+    assert('13.7 属性搜索过滤生效', filtered >= 1 && filtered <= 2, filtered);
+    search.value = '';
+    search.dispatchEvent(new Event('input', { bubbles: true }));
+
+    assert('13.8 定位器区域渲染四类框架', sh.querySelectorAll('.loc').length >= 8,
+      sh.querySelectorAll('.loc').length);
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', code: 'KeyE', altKey: true, shiftKey: true }));
+    assert('13.9 快捷键可隐藏面板', panel.classList.contains('hidden'));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', code: 'KeyE', altKey: true, shiftKey: true }));
+    assert('13.10 快捷键可恢复面板', !panel.classList.contains('hidden'));
+
+    var colBtn = sh.querySelector('[data-act="collapse"]');
+    colBtn.click();
+    assert('13.11 折叠后仍保留恢复按钮', colBtn.textContent === '展开' && sh.querySelector('.head').contains(colBtn));
+    colBtn.click();
+    assert('13.12 恢复按钮可展开面板', !panel.classList.contains('collapsed') && colBtn.textContent === '▾');
+
+    var panes = sh.querySelectorAll('[data-pane]');
+    var agentPane = sh.querySelector('[data-pane="agent"]');
+    assert('13.13 Agent 输出位于第一分页且默认显示', panes[0] === agentPane && agentPane.classList.contains('on'));
+    assert('13.14 Agent 按钮位于该分页最上方', agentPane.firstElementChild.classList.contains('btns'));
+    sh.querySelector('[data-act="tab"][data-tab="locators"]').click();
+    assert('13.15 分页切换只显示当前分页', !agentPane.classList.contains('on') &&
+      sh.querySelector('[data-pane="locators"]').classList.contains('on'));
+    sh.querySelector('[data-act="tab"][data-tab="agent"]').click();
+
+    /* ---- 14. 选择器与层级导航 ---- */
+    window.__AEI__.start();
+    var navTarget = document.getElementById('deep-link');
+    var nr = navTarget.getBoundingClientRect();
+    navTarget.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: nr.left + 5, clientY: nr.top + 5 }));
+    await wait(80);
+    var hl = sh.querySelector('[data-role="hl"]');
+    assert('14.1 悬停时高亮层出现', hl.style.display === 'block');
+    navTarget.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: nr.left + 5, clientY: nr.top + 5 }));
+    await wait(80);
+    assert('14.2 单击锁定目标元素', window.__AEI__.state.current === navTarget);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', code: 'ArrowUp' }));
+    await wait(320);
+    assert('14.3 方向键切换到父级', window.__AEI__.state.current === navTarget.parentElement,
+      window.__AEI__.state.current ? window.__AEI__.state.current.tagName : 'null');
+    var parentBtn = sh.querySelector('[data-act="pick-node"][data-kind="parent"]');
+    var expectParent = window.__AEI__.state.parentMap[0];
+    parentBtn.click();
+    await wait(60);
+    assert('14.4 面板「选中」可跳转父级', window.__AEI__.state.current === expectParent);
+    var childBtn = sh.querySelector('[data-act="pick-node"][data-kind="child"]');
+    var expectChild = childBtn ? window.__AEI__.state.nodeMap[childBtn.getAttribute('data-idx')] : null;
+    if (childBtn) childBtn.click();
+    await wait(60);
+    assert('14.5 子级树「选中」可跳转子元素', !!expectChild && window.__AEI__.state.current === expectChild);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape' }));
+    assert('14.6 Esc 退出选择模式', window.__AEI__.state.picking === false);
+
+    /* ---- 15. Shadow DOM 失效监测与 XPath 限制说明 ---- */
+    var sr2 = document.getElementById('shadow-host').shadowRoot;
+    j = sel(sr2.getElementById('shadow-btn'));
+    var xpRows = fw(j, 'xpath');
+    assert('15.1 Shadow 内 XPath 不伪造成功结果', xpRows.length > 0 && xpRows.every(function (l) {
+      return l.targetMatch === true || !!l.note;
+    }), xpRows.map(function (l) { return l.note || 'targetMatch'; }).join(' / '));
+    sr2.innerHTML = '';
+    await wait(900);
+    assert('15.2 Shadow 内元素移除后标记失效', window.__AEI__.state.stale === true);
+
+    /* ---- 16. 提示词 / 指令 / 撤销 / 采集列表 ---- */
+    j = sel(document.getElementById('btn-save'));
+    var prompt = window.__AEI__.prompt();
+    assert('16.1 提示词含 Page 与 selector', /^Page: /.test(prompt) && prompt.indexOf('selector: ') > 0, prompt.split('\n')[0]);
+    assert('16.2 提示词含 locator 与 grade', prompt.indexOf('locator: ') > 0 && prompt.indexOf('grade: ') > 0);
+    assert('16.3 上下文含视觉摘要', !!(j.context && /bg |border|rounded/.test(j.context.visual || '')), j.context && j.context.visual);
+    assert('16.11 提示词含 data-* 属性', prompt.indexOf('data-testid: save-btn') > 0);
+    assert('16.4 框架信息结构完整', !!(j.framework && Array.isArray(j.framework.components) && 'source' in j.framework));
+    var jEmail = sel(document.getElementById('email'));
+    assert('16.5 表单元素语义上下文', /form/.test((jEmail.context && jEmail.context.inside) || ''), jEmail.context && jEmail.context.inside);
+    sel(document.getElementById('btn-save'));
+    sel(document.getElementById('link-doc'));
+    window.__AEI__.undo();
+    await wait(60);
+    assert('16.6 撤销恢复到上一个元素', window.__AEI__.state.current === document.getElementById('btn-save'));
+    window.__AEI__.clearCollection();
+    window.__AEI__.addCollection(document.getElementById('btn-save'));
+    window.__AEI__.setInstruction(0, '改成红色');
+    var cp = window.__AEI__.collectionPrompt();
+    assert('16.7 采集提示词含指令', cp.indexOf('instruction: 改成红色') > 0 && /^Page: /.test(cp));
+    window.__AEI__.removeCollection(0);
+    assert('16.8 采集列表可移除', window.__AEI__.state.collection.length === 0);
+    assert('16.9 框选遮罩层已注入', !!sh.querySelector('[data-role="marquee"]'));
+    window.__AEI__.start();
+    var loadBtn = document.getElementById('btn-load');
+    var lr = loadBtn.getBoundingClientRect();
+    loadBtn.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: lr.left + 5, clientY: lr.top + 5 }));
+    loadBtn.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: lr.left + 5, clientY: lr.top + 5 }));
+    loadBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true, clientX: lr.left + 5, clientY: lr.top + 5 }));
+    await wait(60);
+    assert('16.10 Shift+单击加入采集列表', window.__AEI__.state.collection.some(function (it) { return it.el === loadBtn; }));
+    window.__AEI__.stop();
+    window.__AEI__.clearCollection();
+
+    lines.push('---- 自检完成：PASS ' + pass + ' / FAIL ' + fail + ' ----');
+    paint();
+    document.title = (fail === 0 ? 'RESULT-ALL-PASS' : 'RESULT-FAIL-' + fail) + ' · AEI 验收';
+    window.__AEI_RESULT__ = { pass: pass, fail: fail, lines: lines.slice() };
+  }
+
+  window.addEventListener('load', function () { setTimeout(main, 300); });
+})();
+</script>
+</body>
+</html>
